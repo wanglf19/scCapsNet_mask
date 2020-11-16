@@ -11,10 +11,9 @@ This repository contains the official Keras implementation of:
 - keras 2.2.4
 - tensorflow 1.11.0
 
-**Citation**
-Please cite:
-Wang, L., Nie, R., Yu, Z. et al. An interpretable deep-learning architecture of capsule networks for identifying cell-type gene expression programs from single-cell RNA-sequencing data. Nat Mach Intell 2, 693–703 (2020). https://doi.org/10.1038/s42256-020-00244-4
-Wang, L., Zhang, J., and Cai, J. scCapsNet-mask: an automatic version of scCapsNet. Biorxiv 2020.11.02.365346v1. https://doi.org/10.1101/2020.11.02.365346
+**Citation for those code**
+- Wang, L., Nie, R., Yu, Z. et al. An interpretable deep-learning architecture of capsule networks for identifying cell-type gene expression programs from single-cell RNA-sequencing data. Nat Mach Intell 2, 693–703 (2020). https://doi.org/10.1038/s42256-020-00244-4
+- Wang, L., Zhang, J., and Cai, J. scCapsNet-mask: an automatic version of scCapsNet. Biorxiv 2020.11.02.365346v1. https://doi.org/10.1101/2020.11.02.365346
 
 **1. Model training and analysis**
 
@@ -50,6 +49,7 @@ python scCapsNet_mask.py --inputdata=data/retina_data.npy --inputcelltype=data/r
 #- Testing your own dataset
 Tips: set the dim_capsule twice as the number of cell types
 python scCapsNet_mask.py --inputdata=your_data --inputcelltype=your_inputcelltype --num_classes=your_num_classes --dim_capsule=your_dim_capsule
+```
 
 **2. Model analysis**
 
