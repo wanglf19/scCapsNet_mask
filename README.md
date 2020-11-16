@@ -73,11 +73,14 @@ Choosen_genes.png (Scatter plot)
 ```
 
 - *training weight*
+```
 training_n8_r30_dim16_e10_b400_.weight
+```
 
 - *Cell type related genes*
+```
 total_select_genes_one_side.npy
-
+```
 
 **capsule networks implementation**
 
