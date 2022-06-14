@@ -1,8 +1,8 @@
-## scCapsNet-mask: an automatic version of scCapsNet
+## scCapsNet-mask: an updated version of scCapsNet with extended applicability in functional analysis related to scRNA-seq data
 
 This repository contains the official Keras implementation of:
 
-**scCapsNet-mask: an automatic version of scCapsNet**
+**scCapsNet-mask: scCapsNet-mask: an updated version of scCapsNet with extended applicability in functional analysis related to scRNA-seq data**
 
 
 **Requirements**
@@ -20,10 +20,10 @@ This repository contains the official Keras implementation of:
 - *About this article*
 ```
 #Augments:
-#'--inputdata', type=str, default='data/PBMC_data.npy', help='address for input data'
+#'--inputdata', type=str, default='data/PBMC_data.npz', help='address for input data'
 #'--inputcelltype', type=str, default='data/PBMC_celltype.npy', help='address for celltype label'
 #'--num_classes', type=int, default=8, help='number of cell type'
-#'--randoms', type=int, default=30, help='random number to split dataset'
+#'--randoms', type=int, default=35, help='random number to split dataset'
 #'--dim_capsule', type=int, default=16, help='dimension of the capsule'
 #'--batch_size', type=int, default=400, help='training parameters_batch_size'
 #'--epochs', type=int, default=15, help='training parameters_epochs'
@@ -37,10 +37,10 @@ This repository contains the official Keras implementation of:
 To unzip the PBMC_data.rar and retina_data.rar into dictionary 'data' then run:
 
 For PBMC_dataset
-python scCapsNet_mask.py --inputdata=data/PBMC_data.npy --inputcelltype=data/PBMC_celltype.npy --num_classes=8 --dim_capsule=16 --pc_slice=30 --epochs=10
+python scCapsNet_mask.py --inputdata=data/PBMC_data.npz --inputcelltype=data/PBMC_celltype.npy --num_classes=8 --dim_capsule=16 --pc_slice=30 --epochs=10
 
 For RBC_dataset
-python scCapsNet_mask.py --inputdata=data/retina_data.npy --inputcelltype=data/retina_celltype.npy --num_classes=15 --dim_capsule=32 --pc_slice=20
+python scCapsNet_mask.py --inputdata=data/retina_data.npz --inputcelltype=data/retina_celltype.npy --num_classes=15 --dim_capsule=32 --pc_slice=20
 
 ```
 
@@ -58,10 +58,10 @@ python scCapsNet_mask.py --inputdata=your_data --inputcelltype=your_inputcelltyp
 The following codes could reproduce Figures in the main text.
 ```
 For PBMC_dataset
-python scCapsNet_mask.py --inputdata=data/PBMC_data.npy --inputcelltype=data/PBMC_celltype.npy --num_classes=8 --dim_capsule=16 --pc_slice=30 --weights=data/PBMC_demo.weight --training=F
+python scCapsNet_mask.py --inputdata=data/PBMC_data.npz --inputcelltype=data/PBMC_celltype.npy --num_classes=8 --dim_capsule=16 --pc_slice=30 --weights=data/PBMC_demo.weight --training=F
 
 For RBC_dataset
-python scCapsNet_mask.py --inputdata=data/retina_data.npy --inputcelltype=data/retina_celltype.npy --num_classes=15 --dim_capsule=32 --pc_slice=20 --weights=data/retina_demo.weight --training=F
+python scCapsNet_mask.py --inputdata=data/retina_data.npz --inputcelltype=data/retina_celltype.npy --num_classes=15 --dim_capsule=32 --pc_slice=20 --weights=data/retina_demo.weight --training=F
 ```
 
 **Output**
@@ -75,6 +75,11 @@ Choosen_genes.png (Scatter plot)
 - *training weight*
 ```
 training_n8_r30_dim16_e10_b400_.weight
+```
+
+- *Prediction probability*
+```
+Prediction_probability.npy
 ```
 
 - *Cell type related genes*

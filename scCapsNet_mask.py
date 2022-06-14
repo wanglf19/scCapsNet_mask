@@ -14,6 +14,7 @@ from pandas import DataFrame
 from sklearn.model_selection import train_test_split
 from sklearn.manifold import TSNE
 import argparse
+from scipy import sparse
 
 
 #####################################################################################################################
@@ -48,17 +49,19 @@ def scatter_plot(weightpca,select_genes):
 
 
 #####################################################################################################################
-parser = argparse.ArgumentParser(description='scCapsNet-mask')
 # system config
+parser = argparse.ArgumentParser(description='scCapsNet-mask')
 
-parser.add_argument('--inputdata', type=str, default='data/PBMC_data.npy', help='address for input data')
+
+parser.add_argument('--inputdata', type=str, default='data/PBMC_data.npz', help='address for input data')
 parser.add_argument('--inputcelltype', type=str, default='data/PBMC_celltype.npy', help='address for celltype label')
 parser.add_argument('--num_classes', type=int, default=8, help='number of cell type')
-parser.add_argument('--randoms', type=int, default=30, help='random number to split dataset')
+parser.add_argument('--randoms', type=int, default=35, help='random number to split dataset')
 parser.add_argument('--dim_capsule', type=int, default=16, help='dimension of the capsule')
+parser.add_argument('--activation_F', type=str, default='relu', help='activation function')
 parser.add_argument('--batch_size', type=int, default=400, help='training parameters_batch_size')
 parser.add_argument('--epochs', type=int, default=15, help='training parameters_epochs')
-parser.add_argument('--training', type=str, default='T', help='training model(T) or loading model(F) ')
+parser.add_argument('--training', type=str, default='F', help='training model(T) or loading model(F) ')
 parser.add_argument('--weights', type=str, default='data/PBMC_demo.weight', help='trained weights')
 parser.add_argument('--plot_direction', type=str, default='one_side', help='display option, both_side or one_side')
 parser.add_argument('--pc_slice', type=int, default=20, help='fineness divided along PC direction ')
@@ -71,6 +74,7 @@ inputcelltype = args.inputcelltype
 num_classes = args.num_classes
 randoms = args.randoms
 z_dim = args.dim_capsule
+activation_F = args.activation_F
 epochs = args.epochs
 batch_size = args.batch_size
 training = args.training
@@ -81,7 +85,13 @@ threshold = args.threshold
 
 #####################################################################################################################
 #training data and test data
-data = np.load(inputdata)
+if inputdata[-3:] == 'npz':
+    data = sparse.load_npz(inputdata)
+    data = data.todense()
+    data = np.asarray(data)
+else:
+    data = np.load(inputdata)
+
 labels = np.load(inputcelltype)
 
 print(type(data))
@@ -105,7 +115,7 @@ x = x_in
 x_all = list(np.zeros((num_classes,1)))
 encoders = []
 for i in range(num_classes):
-    x_all[i] = Dense(z_dim, activation='relu')(x_in)
+    x_all[i] = Dense(z_dim, activation=activation_F)(x_in)
     encoders.append(Model(x_in, x_all[i]))
 
 x = Concatenate()(x_all)
@@ -135,6 +145,12 @@ if training=='T':
 else:
     model.load_weights(weight)
 
+
+#####################################################################################################################
+#output Prediction probability for each type
+print(data.shape)
+result  = model.predict(data)
+np.save("results/Prediction_probability.npy", result)
 
 #####################################################################################################################
 #Find cell type related genes
