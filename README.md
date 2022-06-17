@@ -2,8 +2,7 @@
 
 This repository contains the official Keras implementation of:
 
-**scCapsNet-mask: scCapsNet-mask: an updated version of scCapsNet with extended applicability in functional analysis related to scRNA-seq data**
-
+**scCapsNet-mask: an updated version of scCapsNet with extended applicability in functional analysis related to scRNA-seq data**
 
 **Requirements**
 - Python 3.6
@@ -20,21 +19,20 @@ This repository contains the official Keras implementation of:
 - *About this article*
 ```
 #Augments:
-#'--inputdata', type=str, default='data/PBMC_data.npz', help='address for input data'
-#'--inputcelltype', type=str, default='data/PBMC_celltype.npy', help='address for celltype label'
-#'--num_classes', type=int, default=8, help='number of cell type'
-#'--randoms', type=int, default=35, help='random number to split dataset'
-#'--dim_capsule', type=int, default=16, help='dimension of the capsule'
+#'--inputdata', type=str, default='data/retina_data.npz', help='address for input data'
+#'--inputcelltype', type=str, default='data/retina_celltype.npy', help='address for celltype label'
+#'--num_classes', type=int, default=15, help='number of cell type'
+#'--randoms', type=int, default=30, help='random number to split dataset'
+#'--dim_capsule', type=int, default=32, help='dimension of the capsule'
+#'--activation_F', type=str, default='relu', help='activation function'
 #'--batch_size', type=int, default=400, help='training parameters_batch_size'
 #'--epochs', type=int, default=15, help='training parameters_epochs'
-#'--training', type=str, default='T', help='training model(T) or loading model(F) '
-#'--weights', type=str, default='data/PBMC_demo.weight', help='trained weights'
+#'--training', type=str, default='F', help='training model(T) or loading model(F) '
+#'--weights', type=str, default='data/retina_demo.weight', help='trained weights'
 #'--plot_direction', type=str, default='one_side', help='display option, both_side or one_side'
 #'--pc_slice', type=int, default=20, help='fineness divided along PC direction '
 #'--threshold', type=float, default=0.05, help='threshold for setting dotted line'
 
-
-To unzip the PBMC_data.rar and retina_data.rar into dictionary 'data' then run:
 
 For PBMC_dataset
 python scCapsNet_mask.py --inputdata=data/PBMC_data.npz --inputcelltype=data/PBMC_celltype.npy --num_classes=8 --dim_capsule=16 --pc_slice=30 --epochs=10
@@ -55,7 +53,7 @@ python scCapsNet_mask.py --inputdata=your_data --inputcelltype=your_inputcelltyp
 
 - *Demo -- About this article*
 
-The following codes could reproduce Figures in the main text.
+The following codes could reproduce Figures in the article.
 ```
 For PBMC_dataset
 python scCapsNet_mask.py --inputdata=data/PBMC_data.npz --inputcelltype=data/PBMC_celltype.npy --num_classes=8 --dim_capsule=16 --pc_slice=30 --weights=data/PBMC_demo.weight --training=F
