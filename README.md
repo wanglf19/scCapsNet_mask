@@ -20,15 +20,18 @@ This repository contains the official Keras implementation of:
 #'--inputcelltype', type=str, default='data/retina_celltype.npy', help='address for celltype label'
 #'--num_classes', type=int, default=15, help='number of cell type'
 #'--randoms', type=int, default=30, help='random number to split dataset'
+#'--test_size', type=float, default=0.1, help='test size'
 #'--dim_capsule', type=int, default=32, help='dimension of the capsule'
 #'--activation_F', type=str, default='relu', help='activation function'
 #'--batch_size', type=int, default=400, help='training parameters_batch_size'
 #'--epochs', type=int, default=15, help='training parameters_epochs'
-#'--training', type=str, default='F', help='training model(T) or loading model(F) '
+#'--lr', type=float, default=0.00015, help='Learning rate for Adam optimizers'
+#'--training', type=str, default='T', help='training model(T) or loading model(F) '
 #'--weights', type=str, default='data/retina_demo.weight', help='trained weights'
 #'--plot_direction', type=str, default='one_side', help='display option, both_side or one_side'
 #'--pc_slice', type=int, default=20, help='fineness divided along PC direction '
 #'--threshold', type=float, default=0.05, help='threshold for setting dotted line'
+
 
 
 For PBMC_dataset

@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.manifold import TSNE
 import argparse
 from scipy import sparse
+import numpy as np
 
 
 #####################################################################################################################
@@ -61,11 +62,13 @@ parser.add_argument('--dim_capsule', type=int, default=32, help='dimension of th
 parser.add_argument('--activation_F', type=str, default='relu', help='activation function')
 parser.add_argument('--batch_size', type=int, default=400, help='training parameters_batch_size')
 parser.add_argument('--epochs', type=int, default=15, help='training parameters_epochs')
-parser.add_argument('--training', type=str, default='F', help='training model(T) or loading model(F) ')
+parser.add_argument('--training', type=str, default='T', help='training model(T) or loading model(F) ')
 parser.add_argument('--weights', type=str, default='data/retina_demo.weight', help='trained weights')
 parser.add_argument('--plot_direction', type=str, default='one_side', help='display option, both_side or one_side')
 parser.add_argument('--pc_slice', type=int, default=20, help='fineness divided along PC direction ')
 parser.add_argument('--threshold', type=float, default=0.05, help='threshold for setting dotted line')
+parser.add_argument('--lr', type=float, default=0.00015, help='Learning rate for Adam optimizers')
+parser.add_argument('--test_size', type=float, default=0.1, help='test size')
 
 
 args = parser.parse_args()
@@ -82,6 +85,8 @@ weight = args.weights
 plot_direction = args.plot_direction
 pc_slice = args.pc_slice
 threshold = args.threshold
+testsize = args.test_size
+l_r = args.lr
 
 #####################################################################################################################
 #training data and test data
@@ -97,7 +102,7 @@ labels = np.load(inputcelltype)
 print(type(data))
 print(data.shape)
 
-x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size = 0.1, random_state= randoms)
+x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size = testsize, random_state= randoms)
 Y_test = y_test
 Y_train = y_train
 
@@ -125,7 +130,7 @@ output = Lambda(lambda x: K.sqrt(K.sum(K.square(x), 2)), output_shape=(num_class
 
 model = Model(inputs=x_in, outputs=output)
 
-adam = optimizers.Adam(lr=0.00015,beta_1=0.9,beta_2=0.999,epsilon=1e-08)
+adam = optimizers.Adam(lr=l_r,beta_1=0.9,beta_2=0.999,epsilon=1e-08)
 model.compile(loss=lambda y_true,y_pred: y_true*K.relu(0.9-y_pred)**2 + 0.25*(1-y_true)*K.relu(y_pred-0.1)**2,
               optimizer=adam,
               metrics=['accuracy'])
@@ -188,7 +193,9 @@ for k in range(num_classes):
     ############################################################################################################
     #backward
     ratio_plot = np.zeros((num_classes, pc_slice + 1))
-    x_new_test = copy.deepcopy(x_test)
+    #x_new_test = copy.deepcopy(x_test)
+    x_new_test = copy.deepcopy(x_train)
+
     dotted_line = -1
     select_genes = []
     plot_x = []
@@ -216,9 +223,9 @@ for k in range(num_classes):
         total = np.zeros((num_classes, 1))
         correct = np.zeros((num_classes, 1))
 
-        for i in range(x_test.shape[0]):
-            index_int = int(Y_test[i])
-            if Y_test[i] == Y_pred_1[i]:
+        for i in range(x_train.shape[0]):
+            index_int = int(Y_train[i])
+            if Y_train[i] == Y_pred_1[i]:
                 correct[index_int] = correct[index_int] + 1
             total[index_int] = total[index_int] + 1
 
@@ -245,7 +252,7 @@ for k in range(num_classes):
     ############################################################################################################
     # forward
     ratio_plot = np.zeros((num_classes, pc_slice+1))
-    x_new_test = copy.deepcopy(x_test)
+    x_new_test = copy.deepcopy(x_train)
     dotted_line = -1
     select_genes = []
     plot_x = []
@@ -272,9 +279,9 @@ for k in range(num_classes):
         total = np.zeros((num_classes, 1))
         correct = np.zeros((num_classes, 1))
 
-        for i in range(x_test.shape[0]):
-            index_int = int(Y_test[i])
-            if Y_test[i] == Y_pred_1[i]:
+        for i in range(x_train.shape[0]):
+            index_int = int(Y_train[i])
+            if Y_train[i] == Y_pred_1[i]:
                 correct[index_int] = correct[index_int] + 1
             total[index_int] = total[index_int] + 1
 
@@ -302,18 +309,20 @@ for k in range(num_classes):
 #############################################################################################################
 #Plotting
 if plot_direction == 'both_side':
-    plt.figure(figsize=(20, 4 * np.round(2 * num_classes / 4, 0)))
+    plt.figure(figsize=(20, 4 * np.ceil(2 * num_classes / 4)))
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
     plt.figure(1)
-    plt.figure(figsize=(20, 4 * np.round(2 * num_classes / 4, 0)))
+    plt.figure(figsize=(20, 4 * np.ceil(2 * num_classes / 4)))
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
     plt.figure(2)
 
 else:
-    plt.figure(figsize=(20, 4 * np.round(num_classes / 4, 0)))
+    plt.figure(figsize=(20, 4 * np.ceil(num_classes / 4)))
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
     plt.figure(1)
-    plt.figure(figsize=(20, 4 * np.round(2 * num_classes / 4, 0)))
+    #plt.figure(figsize=(20, 4 * np.ceil(2 * num_classes / 4, 0)))
+    plt.figure(figsize=(20, 4 * np.ceil(num_classes / 4)))
+
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
     plt.figure(2)
 
@@ -331,7 +340,7 @@ for k in range(num_classes):
         plt.figure(1)
         Lindex = 2 * k + 1
         print('subplot: ' + str(Lindex))
-        ax = plt.subplot(np.round(2 * num_classes / 4, 0), 4, Lindex)
+        ax = plt.subplot(np.ceil(2 * num_classes / 4), 4, Lindex)
         ax.invert_xaxis()
         line_plot(num_classes, plot_x, ratio_plot, dotted_line, dotted_line_real) #prediction accuracy
 
@@ -339,7 +348,7 @@ for k in range(num_classes):
         plt.figure(2)
         Lindex = 2 * k + 1
         print('subplot: ' + str(Lindex))
-        ax = plt.subplot(np.round(2 * num_classes / 4, 0), 4, Lindex)
+        ax = plt.subplot(np.ceil(2 * num_classes / 4), 4, Lindex)
         scatter_plot(weightpca, select_genes) #selected gene
 
         # forward
@@ -353,13 +362,13 @@ for k in range(num_classes):
         plt.figure(1)
         Lindex = 2 * k + 2
         print('subplot: ' + str(Lindex))
-        ax = plt.subplot(np.round(2 * num_classes / 4, 0), 4, Lindex)
+        ax = plt.subplot(np.ceil(2 * num_classes / 4), 4, Lindex)
         line_plot(num_classes, plot_x, ratio_plot, dotted_line, dotted_line_real) #prediction accuracy
         # scatter plot
         plt.figure(2)
         Lindex = 2 * k + 2
         print('subplot: ' + str(Lindex))
-        ax = plt.subplot(np.round(2 * num_classes / 4, 0), 4, Lindex)
+        ax = plt.subplot(np.ceil(2 * num_classes / 4), 4, Lindex)
         scatter_plot(weightpca, select_genes) #selected gene
 
     else:
@@ -384,7 +393,7 @@ for k in range(num_classes):
         plt.figure(1)
         Lindex = k + 1
         print('subplot: ' + str(Lindex))
-        ax = plt.subplot(np.round(num_classes / 4, 0), 4, Lindex)
+        ax = plt.subplot(np.ceil(num_classes / 4), 4, Lindex)
         if direction == 'Backward':
             ax.invert_xaxis()
         line_plot(num_classes, plot_x, ratio_plot, dotted_line, dotted_line_real)
@@ -393,7 +402,7 @@ for k in range(num_classes):
         plt.figure(2)
         Lindex = k + 1
         print('subplot: ' + str(Lindex))
-        ax = plt.subplot(np.round(num_classes / 4, 0), 4, Lindex)
+        ax = plt.subplot(np.ceil(num_classes / 4), 4, Lindex)
         scatter_plot(weightpca, select_genes)
 
 print("Plotting and saving......")
