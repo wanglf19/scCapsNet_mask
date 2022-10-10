@@ -58,8 +58,10 @@ parser.add_argument('--inputdata', type=str, default='data/retina_data.npz', hel
 parser.add_argument('--inputcelltype', type=str, default='data/retina_celltype.npy', help='address for celltype label')
 parser.add_argument('--num_classes', type=int, default=15, help='number of cell type')
 parser.add_argument('--randoms', type=int, default=30, help='random number to split dataset')
+parser.add_argument('--test_size', type=float, default=0.1, help='test size')
 parser.add_argument('--dim_capsule', type=int, default=32, help='dimension of the capsule')
 parser.add_argument('--activation_F', type=str, default='relu', help='activation function')
+parser.add_argument('--lr', type=float, default=0.00015, help='Learning rate for Adam optimizers')
 parser.add_argument('--batch_size', type=int, default=400, help='training parameters_batch_size')
 parser.add_argument('--epochs', type=int, default=15, help='training parameters_epochs')
 parser.add_argument('--training', type=str, default='T', help='training model(T) or loading model(F) ')
@@ -67,8 +69,8 @@ parser.add_argument('--weights', type=str, default='data/retina_demo.weight', he
 parser.add_argument('--plot_direction', type=str, default='one_side', help='display option, both_side or one_side')
 parser.add_argument('--pc_slice', type=int, default=20, help='fineness divided along PC direction ')
 parser.add_argument('--threshold', type=float, default=0.05, help='threshold for setting dotted line')
-parser.add_argument('--lr', type=float, default=0.00015, help='Learning rate for Adam optimizers')
-parser.add_argument('--test_size', type=float, default=0.1, help='test size')
+parser.add_argument('--test_new_sample', type=str, default='F', help='test_new_sample (T) or not (F)')
+
 
 
 args = parser.parse_args()
@@ -87,31 +89,43 @@ pc_slice = args.pc_slice
 threshold = args.threshold
 testsize = args.test_size
 l_r = args.lr
+test_new_sample = args.test_new_sample
 
 #####################################################################################################################
 #training data and test data
-if inputdata[-3:] == 'npz':
-    data = sparse.load_npz(inputdata)
-    data = data.todense()
-    data = np.asarray(data)
+
+if test_new_sample == 'F':
+    if inputdata[-3:] == 'npz':
+        data = sparse.load_npz(inputdata)
+        data = data.todense()
+        data = np.asarray(data)
+    else:
+        data = np.load(inputdata)
+
+    labels = np.load(inputcelltype)
+
+    print(type(data))
+    print(data.shape)
+
+    x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size = testsize, random_state= randoms)
+    Y_test = y_test
+    Y_train = y_train
+
+    y_train = utils.to_categorical(y_train, num_classes)
+    y_test = utils.to_categorical(y_test, num_classes)
+
+    feature_size =  x_train.shape[1]
+    input_size = x_train.shape[1]
+    print(input_size)
 else:
-    data = np.load(inputdata)
-
-labels = np.load(inputcelltype)
-
-print(type(data))
-print(data.shape)
-
-x_train, x_test, y_train, y_test = train_test_split(data, labels, test_size = testsize, random_state= randoms)
-Y_test = y_test
-Y_train = y_train
-
-y_train = utils.to_categorical(y_train, num_classes)
-y_test = utils.to_categorical(y_test, num_classes)
-
-feature_size =  x_train.shape[1]
-input_size = x_train.shape[1]
-print(input_size)
+    if inputdata[-3:] == 'npz':
+        data = sparse.load_npz(inputdata)
+        data = data.todense()
+        data = np.asarray(data)
+    else:
+        data = np.load(inputdata)
+    input_size = data.shape[1]
+    print(input_size)
 
 #####################################################################################################################
 #Model
@@ -156,6 +170,8 @@ else:
 print(data.shape)
 result  = model.predict(data)
 np.save("results/Prediction_probability.npy", result)
+if test_new_sample == 'T':
+    exit()
 
 #####################################################################################################################
 #Find cell type related genes

@@ -31,6 +31,7 @@ This repository contains the official Keras implementation of:
 #'--plot_direction', type=str, default='one_side', help='display option, both_side or one_side'
 #'--pc_slice', type=int, default=20, help='fineness divided along PC direction '
 #'--threshold', type=float, default=0.05, help='threshold for setting dotted line'
+#'--test_new_sample', type=str, default='F', help='test_new_sample (T) or not (F)'
 
 
 
@@ -60,6 +61,12 @@ python scCapsNet_mask.py --inputdata=data/PBMC_data.npz --inputcelltype=data/PBM
 
 For RBC_dataset
 python scCapsNet_mask.py --inputdata=data/retina_data.npz --inputcelltype=data/retina_celltype.npy --num_classes=15 --dim_capsule=32 --pc_slice=20 --weights=data/retina_demo.weight --training=F
+```
+
+**3. Test new samples after model training**
+```
+#- Testing new samples
+python scCapsNet_mask.py --inputdata=your_data --num_classes=your_num_classes --dim_capsule=your_dim_capsule --weights=data/your.weight --training=F --test_new_sample=T
 ```
 
 **Output**
